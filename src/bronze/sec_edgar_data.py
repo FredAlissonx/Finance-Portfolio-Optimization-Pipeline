@@ -66,16 +66,16 @@ class SecEdgarData:
             raise ValueError(f"Invalid email address: {email}") from e
 
     @classmethod
-    def _get_download_path(self) -> str:
+    def _get_download_path(cls) -> str:
         """
         Ensure that the download directory exists, creating it if necessary.
 
         Returns:
             str: The download path where SEC filings will be stored.
         """
-        if not os.path.exists(self.DOWNLOAD_PATH):
-            os.makedirs(self.DOWNLOAD_PATH)
-        return self.DOWNLOAD_PATH
+        if not os.path.exists(cls.DOWNLOAD_PATH):
+            os.makedirs(cls.DOWNLOAD_PATH)
+        return cls.DOWNLOAD_PATH
 
     @classmethod
     def get_downloader(self) -> Downloader:
