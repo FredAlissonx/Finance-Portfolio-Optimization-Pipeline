@@ -81,7 +81,4 @@ class APIUtils:
         if "Note" in data:
             bronze_logger.warning(f"Rate limit hit for {symbol}: {data['Note']}")
             return None
-        if "data" not in data:
-            bronze_logger.error(f"Unexpected response structure for {symbol}")
-            return None
         return data
