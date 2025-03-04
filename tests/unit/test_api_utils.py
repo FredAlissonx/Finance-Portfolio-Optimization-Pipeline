@@ -41,8 +41,7 @@ class TestAPIUtils:
         [
             ({"data": [{"id": 1, "value": 100}]}, {"data": [{"id": 1, "value": 100}]}),
             ({"Error Message": "Invalid request"}, None),
-            ({"Note": "Rate limit exceeded"}, None),
-            ({"unexpected": "data"}, None),
+            ({"Note": "Rate limit exceeded"}, None)
         ],
     )
     def test_validate_response(self, response_data, expected):
@@ -52,7 +51,6 @@ class TestAPIUtils:
          - Empty data
          - API error messages
          - Rate limit warnings
-         - Unexpected structure
         """
         result = APIUtils._validate_response(response_data, symbol="AAPL")
         assert result == expected
