@@ -8,17 +8,26 @@ def set_api_key(monkeypatch):
     monkeypatch.setenv("API_ALPHA_VANTAGE_KEY", "alphakey")
 
 class TestAlphaVantageAPIFetcher:
-    def test_setup_params(self):
-        """Test that _setup_params correctly constructs parameters."""
+    def test_historical_options_setup_params(self):
+        """Test that _setup_params for HISTORICAL_OPTIONS function correctly constructs parameters."""
         expected = {
             "function": "HISTORICAL_OPTIONS",
             "symbol": "TEST",
             "apikey": "alphakey",
             "outputsize": "full"
         }
-        assert AlphaVantageAPIFetcher._setup_params("TEST") == expected
+        assert AlphaVantageAPIFetcher._setup_params(symbol="TEST", function="HISTORICAL_OPTIONS") == expected
+    
+    def test_overview_setup_params(self):
+        """Test that _setup_params for OVERVIEW function correctly constructs parameters."""
+        expected = {
+            "function": "OVERVIEW",
+            "symbol": "TEST",
+            "apikey": "alphakey"
+        }
+        assert AlphaVantageAPIFetcher._setup_params(symbol = "TEST", function = "OVERVIEW") == expected
 
-    def test_fetch_data_success(self, monkeypatch):
+    def test_fetch_data_success_historical_options(self, monkeypatch):
         """
         Test that fetch_data returns valid data when the underlying GET call succeeds.
         (Lower-level behavior is assumed to be covered in APIUtils tests.)
@@ -27,8 +36,9 @@ class TestAlphaVantageAPIFetcher:
             session, "get",
             lambda url, params, timeout: FakeResponse(json_data={"data": "some_data"}, status_code=200)
         )
-        data = AlphaVantageAPIFetcher.fetch_data("TEST")
-        assert data == {"data": "some_data"}
+        expected_data: dict = {"data": "some_data"}
+        assert AlphaVantageAPIFetcher.fetch_data("TEST", "HISTORICAL_OPTIONS") == expected_data
+        assert AlphaVantageAPIFetcher.fetch_data("TEST", "OVERVIEW") == expected_data
 
     @pytest.mark.parametrize(
         "symbols, patch_method, expected",
@@ -57,7 +67,8 @@ class TestAlphaVantageAPIFetcher:
             mocker.patch.object(
                 AlphaVantageAPIFetcher,
                 "fetch_data",
-                side_effect=lambda symbol: {"data": "ok"} if symbol == "AAPL" else None
+                side_effect=lambda symbol, _: {"data": "ok"} if symbol == "AAPL" else None
             )
-        result = AlphaVantageAPIFetcher.fetch_batch_data(symbols)
-        assert result == expected
+        
+        assert AlphaVantageAPIFetcher.fetch_batch_data(symbols = symbols, function = "HISTORICAL_OPTIONS") == expected
+        
