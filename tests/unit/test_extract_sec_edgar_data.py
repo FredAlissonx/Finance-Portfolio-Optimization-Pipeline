@@ -1,6 +1,6 @@
 import pytest
 import os
-from src.bronze.sec_edgar_data import SecEdgarData
+from src.bronze.extract_sec_edgar_data import SecEdgarData
 from sec_edgar_downloader import Downloader
 from unittest.mock import patch, MagicMock
 
@@ -23,7 +23,7 @@ def fake_downloader(mocker):
     Patch the Downloader class in the sec_edgar_data module and return a tuple
     of (patched_downloader_class, fake_downloader_instance) for use in tests.
     """
-    patched = mocker.patch("src.bronze.sec_edgar_data.Downloader")
+    patched = mocker.patch("src.bronze.extract_sec_edgar_data.Downloader")
     fake_instance = patched.return_value
     return patched, fake_instance
 
@@ -75,7 +75,6 @@ class TestSecEdgarData:
         The 'reason' parameter describes the expected error scenario.
         """
         with pytest.raises(ValueError):
-            # print(reason)
             SecEdgarData._validate_company_email_address(email=email)
        
     def test_get_download_path_creates_dir(self, tmp_path):
@@ -110,7 +109,7 @@ class TestSecEdgarData:
         """
         test_download_path = tmp_path / "sec-filings"
         SecEdgarData.DOWNLOAD_PATH = str(test_download_path)
-        mock_init = mocker.patch("src.bronze.sec_edgar_data.Downloader.__init__", return_value=None)
+        mock_init = mocker.patch("src.bronze.extract_sec_edgar_data.Downloader.__init__", return_value=None)
         downloader = SecEdgarData.get_downloader()
         mock_init.assert_called_once_with(
             company_name="name",
@@ -124,7 +123,7 @@ class TestSecEdgarData:
         Test that download_filings calls the Downloader's get method with the correct parameters
         for each combination of ticker and filing type.
         """
-        mocker.patch("src.bronze.sec_edgar_data.os.path.exists", return_value=True)
+        mocker.patch("src.bronze.extract_sec_edgar_data.os.path.exists", return_value=True)
         downloader_class, downloader_instance = fake_downloader
         
         tickers = ["AAPL", "MSFT"]
@@ -152,10 +151,10 @@ class TestSecEdgarData:
         Test that download_filings logs an error if a download fails.
         The Downloader.get method is set to raise an Exception.
         """
-        mocker.patch("src.bronze.sec_edgar_data.os.path.exists", return_value=True)
+        mocker.patch("src.bronze.extract_sec_edgar_data.os.path.exists", return_value=True)
         _, downloader_instance = fake_downloader
         downloader_instance.get.side_effect = Exception("Download failed")
-        mock_logger = mocker.patch("src.bronze.sec_edgar_data.bronze_logger")
+        mock_logger = mocker.patch("src.bronze.extract_sec_edgar_data.bronze_logger")
         
         tickers = ["AAPL"]
         filing_types = {"10-K": "10-K"}
@@ -169,15 +168,12 @@ class TestSecEdgarData:
         """
         Test that download_filings does not call Downloader.get when there are no tickers or filing types.
         """
-        downloader_patch = mocker.patch("src.bronze.sec_edgar_data.Downloader")
+        downloader_patch = mocker.patch("src.bronze.extract_sec_edgar_data.Downloader")
         tickers = []
         filing_types = {}
         filings_per_ticker = 5
         
         SecEdgarData.download_filings(tickers, filing_types, filings_per_ticker)
         
-        downloader_patch.return_value.get.assert_not_called()           
-        
-        
-    
+        downloader_patch.return_value.get.assert_not_called()
         

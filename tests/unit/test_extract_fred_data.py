@@ -1,5 +1,5 @@
 import pytest
-from src.bronze.fred_api import FredAPIFetch
+from src.bronze.extract_fred_data import FredAPIFetch
 
 @pytest.fixture(autouse=True)
 def set_fred_api_key(monkeypatch):

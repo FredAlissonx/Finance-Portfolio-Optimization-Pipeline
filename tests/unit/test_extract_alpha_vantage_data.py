@@ -1,5 +1,5 @@
 import pytest
-from src.bronze.alpha_vantage_api import AlphaVantageAPIFetcher
+from src.bronze.extract_alpha_vantage_data import AlphaVantageAPIFetcher
 from fake_response_api import FakeResponse, fake_request_batch_data
 from utils.api_utils import session
 
