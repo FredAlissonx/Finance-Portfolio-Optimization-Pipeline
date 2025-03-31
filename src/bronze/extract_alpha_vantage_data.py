@@ -92,4 +92,29 @@ class AlphaVantageAPIFetcher(APIUtils):
                 time.sleep(cls.RATE_LIMIT_DELAY)
             
         return results
+
+if __name__ == "__main__":
+    import pandas as pd
+    try:
+        data = AlphaVantageAPIFetcher.fetch_data(
+            symbol="AAPL",
+            function="OVERVIEW"  # Corrected function name
+        )
+        if data:
+            # Adjust key access based on the actual response structure.
+            print(f"Successfully retrieved {data['data'][0]['symbol']} options data")
+        else:
+            print("Failed to retrieve data")
+            
+        # Batch processing example
+        batch_data = AlphaVantageAPIFetcher.fetch_batch_data(
+            symbols=["MSFT", "GOOGL", "AMZN"],
+            function="OVERVIEW"
+        )
+        print(f"Processed {len(batch_data)} symbols")
+        df = pd.DataFrame(data["data"])
+        print(df)
+    except Exception as e:
+        bronze_logger.critical(f"Application error: {str(e)}")
+
     
