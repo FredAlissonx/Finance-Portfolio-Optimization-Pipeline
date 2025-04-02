@@ -12,7 +12,7 @@ class APIUtils:
     """
 
     BASE_URL = ""
-    DEFAULT_TIMEOUT: int = 10
+    DEFAULT_TIMEOUT: tuple = (5, 25)
 
     @classmethod
     def _get_api_key(cls, name_key: str) -> str:
