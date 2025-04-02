@@ -1,6 +1,6 @@
 import pytest
 from src.bronze.extract_alpha_vantage_data import AlphaVantageAPIFetcher
-from fake_response_api import FakeResponse, fake_request_batch_data
+from fake_response_api import FakeResponse, fake_request_data
 from utils.api_utils import session
 
 @pytest.fixture(autouse=True)
@@ -37,8 +37,8 @@ class TestAlphaVantageAPIFetcher:
             lambda url, params, timeout: FakeResponse(json_data={"data": "some_data"}, status_code=200)
         )
         expected_data: dict = {"data": "some_data"}
-        assert AlphaVantageAPIFetcher.fetch_data("TEST", "HISTORICAL_OPTIONS") == expected_data
-        assert AlphaVantageAPIFetcher.fetch_data("TEST", "OVERVIEW") == expected_data
+        assert AlphaVantageAPIFetcher.get_data("TEST", "HISTORICAL_OPTIONS") == expected_data
+        assert AlphaVantageAPIFetcher.get_data("TEST", "OVERVIEW") == expected_data
 
     @pytest.mark.parametrize(
         "symbols, patch_method, expected",
@@ -62,13 +62,13 @@ class TestAlphaVantageAPIFetcher:
          - When 'patch_method' is "fetch_data", we patch fetch_data to simulate partial failures.
         """
         if patch_method == "session":
-            monkeypatch.setattr(session, "get", fake_request_batch_data)
-        elif patch_method == "fetch_data":
+            monkeypatch.setattr(session, "get", fake_request_data)
+        elif patch_method == "get_data":
             mocker.patch.object(
                 AlphaVantageAPIFetcher,
-                "fetch_data",
+                "get_data",
                 side_effect=lambda symbol, _: {"data": "ok"} if symbol == "AAPL" else None
             )
         
-        assert AlphaVantageAPIFetcher.fetch_batch_data(symbols = symbols, function = "HISTORICAL_OPTIONS") == expected
+        assert AlphaVantageAPIFetcher.get_data_in_batch(symbols = symbols, function = "HISTORICAL_OPTIONS") == expected
         
