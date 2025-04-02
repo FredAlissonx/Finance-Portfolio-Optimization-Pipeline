@@ -1,6 +1,5 @@
 from utils.config import bronze_logger
 from utils.api_utils import APIUtils
-from typing import List, Dict, Any
 
 class FredAPIFetch(APIUtils):
     """
@@ -18,7 +17,7 @@ class FredAPIFetch(APIUtils):
         observation_start: str = None,
         observation_end: str = None,
         frequency = None
-        ) -> Dict[str, str]:
+        ) -> dict[str, str]:
         """
         Prepare the query parameters for the FRED API request.
 
@@ -32,7 +31,7 @@ class FredAPIFetch(APIUtils):
             frequency (Optional[str]): The data frequency (e.g., 'daily', 'monthly'). Defaults to None.
 
         Returns:
-            Dict[str, Any]: A dictionary of parameters to be sent with the API request.
+            dict[str]: A dictionary of parameters to be sent with the API request.
         """
         params =  {
             "series_id": series_id,
@@ -61,7 +60,7 @@ class FredAPIFetch(APIUtils):
             series_id (str): The unique identifier for the economic data series.
 
         Returns:
-            List[Dict[str, Any]]: A list of observations from the FRED API. If no observations
+            list[dict[str]]: A list of observations from the FRED API. If no observations
             are found or an error occurs, an empty list is returned.
         """
         params = cls._setup_params(series_id=series_id)
@@ -70,7 +69,7 @@ class FredAPIFetch(APIUtils):
         return data
     
     @classmethod
-    def fetch_batch_series(cls, series_ids: List[str]) -> Dict:
+    def fetch_batch_series(cls, series_ids: list[str]) -> dict:
         """
         Fetch observations data for multiple FRED series.
 
@@ -78,10 +77,10 @@ class FredAPIFetch(APIUtils):
         into a dictionary mapping each series ID to its respective list of observations.
 
         Args:
-            series_ids (List[str]): A list of unique identifiers for economic data series.
+            series_ids (list[str]): A list of unique identifiers for economic data series.
 
         Returns:
-            Dict[str, List[Dict[str, Any]]]: A dictionary where keys are series IDs and values are lists
+            dict[str, list[dict[str]]]: A dictionary where keys are series IDs and values are lists
             of observations for each series.
         """
         result = {}

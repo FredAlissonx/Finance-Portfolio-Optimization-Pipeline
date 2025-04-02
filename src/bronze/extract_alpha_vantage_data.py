@@ -1,4 +1,3 @@
-from typing import Optional, Dict, List
 from utils.config import bronze_logger
 from utils.api_utils import APIUtils
 import time
@@ -12,11 +11,11 @@ class AlphaVantageAPIFetcher(APIUtils):
     """
 
     BASE_URL: str = "https://www.alphavantage.co/query"
-    RATE_LIMIT_DELAY: int = 15
-    SUPPORTED_FUNCTIONS: List[str] = ["HISTORICAL_OPTIONS", "OVERVIEW"]
+    RATE_LIMIT_DELAY_A_DAY: int = 25
+    SUPPORTED_FUNCTIONS: list[str] = ["HISTORICAL_OPTIONS", "OVERVIEW"]
     
     @classmethod
-    def _setup_params(cls, symbol: str, function: str) -> Dict:
+    def _setup_params(cls, symbol: str, function: str) -> dict:
         """
         Prepare the parameters required for the Alpha Vantage API request.
 
@@ -47,7 +46,7 @@ class AlphaVantageAPIFetcher(APIUtils):
         return params
 
     @classmethod
-    def fetch_data(cls, symbol: str, function: str) -> Optional[Dict]:
+    def get_data(cls, symbol: str, function: str) -> dict:
         """
         Fetch historical options data for the given symbol from the Alpha Vantage API.
 
@@ -68,7 +67,7 @@ class AlphaVantageAPIFetcher(APIUtils):
         return validate_data
         
     @classmethod
-    def fetch_batch_data(cls, symbols: List[str], function: str) -> Dict[str, Optional[Dict]]:
+    def get_data_in_batch(cls, symbols: list[str], function: str) -> dict[str, dict]:
         """
         Fetch historical options data for multiple symbols from the Alpha Vantage API.
 
@@ -85,7 +84,7 @@ class AlphaVantageAPIFetcher(APIUtils):
         results: dict = {}
         for idx, symbol in enumerate(symbols):
             bronze_logger.info(f"Processing {symbol} ({idx+1}/{len(symbols)})")
-            results[symbol] = cls.fetch_data(symbol, function)
+            results[symbol] = cls.get_data(symbol, function)
             
             if (idx + 1) % 5 == 0:
                 bronze_logger.debug(f"Rate limit throttle: Waiting {cls.RATE_LIMIT_DELAY}s")
@@ -96,24 +95,23 @@ class AlphaVantageAPIFetcher(APIUtils):
 if __name__ == "__main__":
     import pandas as pd
     try:
-        data = AlphaVantageAPIFetcher.fetch_data(
+        data = AlphaVantageAPIFetcher.get_data(
             symbol="AAPL",
             function="OVERVIEW"  # Corrected function name
         )
         if data:
             # Adjust key access based on the actual response structure.
-            print(f"Successfully retrieved {data['data'][0]['symbol']} options data")
+            print(f"Successfully retrieved {data.get('Symbol')} options data")
         else:
             print("Failed to retrieve data")
             
         # Batch processing example
-        batch_data = AlphaVantageAPIFetcher.fetch_batch_data(
+        batch_data = AlphaVantageAPIFetcher.get_data_in_batch(
             symbols=["MSFT", "GOOGL", "AMZN"],
             function="OVERVIEW"
         )
         print(f"Processed {len(batch_data)} symbols")
-        df = pd.DataFrame(data["data"])
-        print(df)
+        df = pd.DataFrame(batch_data["data"])
     except Exception as e:
         bronze_logger.critical(f"Application error: {str(e)}")
 

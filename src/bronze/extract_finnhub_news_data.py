@@ -2,14 +2,13 @@ from utils.config import bronze_logger, session
 from utils.api_utils import APIUtils
 import finnhub
 from datetime import datetime
-from typing import List, Dict
 
 class FinnhubNewsAPIFetcher:
     BASE_URL: str = "https://finnhub.io/api/v1"
-    finnhub_client = finnhub.Client(api_key=APIUtils._get_api_key("API_FINHUB_NEWS_KEY"))
+    finnhub_client = finnhub.Client(api_key=APIUtils._get_api_key("API_FINNHUB_NEWS_KEY"))
     
     @classmethod
-    def fetch_market_holiday(cls, exchange: str = "US") -> Dict:
+    def fetch_market_holiday(cls, exchange_symbol: str = "US") -> dict:
         """
         Fetch market holiday information for a specified exchange.
 
@@ -22,18 +21,18 @@ class FinnhubNewsAPIFetcher:
                 holiday information is requested. Defaults to "US".
 
         Returns:
-            Dict: A dictionary containing market holiday details for the given exchange.
+            dict: A dictionary containing market holiday details for the given exchange.
         """
-        return cls.finnhub_client.market_holiday(exchange = exchange)
+        return cls.finnhub_client.market_holiday(exchange = exchange_symbol)
         
     
     @classmethod
-    def fetch_finnhub_news(cls, symbols: List[str], max_company_articles: int = 50, max_market_articles: int = 20) -> Dict:
+    def fetch_finnhub_news(cls, symbols: list[str], max_company_articles: int = 50, max_market_articles: int = 20) -> dict:
         """
         Fetches company-specific and market-wide news from Finnhub API from 2016 to today
         
         Args:
-            symbols (list): List of stock tickers (e.g., ['AAPL', 'TSLA'])
+            symbols (list): list of stock tickers (e.g., ['AAPL', 'TSLA'])
             max_company_articles (int): Max articles per company
             max_market_articles (int): Max market news articles
         
@@ -56,7 +55,7 @@ class FinnhubNewsAPIFetcher:
             }
         }
 
-        def process_article(article: Dict, news_type: str = 'company') -> Dict:
+        def process_article(article: dict, news_type: str = 'company') -> dict:
             """Process raw article data into standardized format"""
             dt = datetime.fromtimestamp(article['datetime']) if 'datetime' in article else None
             return {
@@ -121,5 +120,5 @@ class FinnhubNewsAPIFetcher:
         return news_data
 
 if __name__ == "__main__":
-    news_data = FinnhubNewsAPIFetcher.fetch_finnhub_news(["AAPL"])
+    news_data = FinnhubNewsAPIFetcher.fetch_market_holiday()
     print(news_data)
