@@ -50,7 +50,7 @@ class TestAlphaVantageAPIFetcher:
             ),
             (
                 ["AAPL", "INVALID"],
-                "fetch_data",
+                "get_data",
                 {"AAPL": {"data": "ok"}, "INVALID": None}
             )
         ]
